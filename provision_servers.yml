@@ -1,0 +1,53 @@
+---
+- name: Play to provision OpenStack servers
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  become: no
+
+  roles:
+    - os_server
+
+  tasks:
+    - name: Gather OpenStack server details
+      openstack.cloud.server_info:
+        cloud: "{{ guid }}-project"
+      register: os_instances
+
+    - name: Add OpenStack instances to in-memory inventory
+      add_host:
+        name: "{{ item.name }}"
+        group: "{{ item.metadata.AnsibleGroup }}"
+        ansible_host: "{{ item.private_v4 }}" 
+      when: item.metadata.AnsibleGroup is defined
+      loop: "{{ os_instances.openstack_servers }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+- name: Play to configure OpenStack servers
+  hosts:
+    - load_balancers
+    - app_servers
+    - database_servers
+  gather_facts: no
+  become: yes
+
+  pre_tasks:
+    - name: Configure DNS
+      lineinfile:
+        path: /etc/sysconfig/network-scripts/ifcfg-eth0
+        line: "{{ item }}"
+        state: present
+      loop:
+        - PEERDNS=no
+        - DNS1={{ dns_nameserver }}
+      notify: restart_network
+
+  roles:
+    - register_satellite
+
+  handlers:
+    - name: restart_network
+      service:
+        name: NetworkManager
+        state: restarted

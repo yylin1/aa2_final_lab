@@ -1,0 +1,9 @@
+---
+- name: Play to configure application servers
+  hosts: database_servers
+  gather_facts: yes
+  become: yes
+
+  roles:
+    - firewall
+    - database
