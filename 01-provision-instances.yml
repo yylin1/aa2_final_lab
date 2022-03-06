@@ -1,0 +1,16 @@
+---
+# Playbook to provision openstack instances
+- name: "Create OpenStack instances"
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  become: false
+  vars_files:
+    - vars/common.yml
+    - vars/openstack_instances.yml
+  vars:
+    instance_state: present
+  tasks:
+    - name: "Create OpenStack instances"
+      include_role:
+        name: openstack_instances

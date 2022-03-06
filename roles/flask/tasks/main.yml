@@ -1,0 +1,7 @@
+---
+# tasks file for flask
+- include_tasks: install.yml
+  when: flask_install_state == "present"
+
+- include_tasks: uninstall.yml
+  when: flask_install_state == "absent"

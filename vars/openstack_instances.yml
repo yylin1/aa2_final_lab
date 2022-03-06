@@ -1,0 +1,22 @@
+---
+# vars file for openstack_instances
+openstack_instances:
+  # app1 (Flask)
+  - name: app1
+    metadata:
+      AnsibleGroup: app_servers
+
+  # app2 (Flask)
+  - name: app2
+    metadata:
+      AnsibleGroup: app_servers
+
+  # appdb1 (PostgreSQL)
+  - name: appdb1
+    metadata:
+      AnsibleGroup: database_servers
+
+  # frontend1 (HAProxy)
+  - name: frontend1
+    metadata:
+      AnsibleGroup: load_balancers

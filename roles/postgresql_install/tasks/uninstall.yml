@@ -1,0 +1,28 @@
+---
+# tasks file for postgresql_install
+- name: "Teardown PostgreSQL 12"
+  block:
+    - name: "Set tmp facts"
+      set_fact:
+        tmp_postgres_rhel8_repo_name: "{{ postgres_rhel8_repo | urlsplit('path') | basename }}"
+
+    - name: "Remove PostgreSQL packages"
+      package:
+        name: "{{ __package }}"
+        state: "{{ postgres_install_state | default('absent') }}"
+      loop:
+        - "{{ tmp_postgres_rhel8_repo_name.split('.') | first }}"
+        - "{{ postgres_packages }}"
+        - "{{ postgres_library }}"
+      loop_control:
+        loop_var: __package
+
+    - name: "Remove PostgreSQL 12 data directory"
+      file:
+        path: "{{ postgres_12_data_dir }}"
+        state: "{{ postgres_install_state | default('absent') }}"
+
+    - name: "Remove Postgres user"
+      user:
+        name: postgres
+        state: "{{ postgres_install_state | default('absent') }}"

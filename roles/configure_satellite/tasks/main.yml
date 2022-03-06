@@ -1,0 +1,48 @@
+---
+# tasks file for configure_satellite
+- name: "Fetch control node info"
+  delegate_to: localhost
+  connection: local
+  become: false
+  os_server_info:
+    server: control
+  register: control_node_info
+
+- name: "Update DNS IP to control host"
+  lineinfile:
+    state: present
+    path: /etc/sysconfig/network-scripts/ifcfg-eth0
+    line: "{{ __ifcfg_line }}"
+  loop:
+    - PEERDNS=no
+    - DNS1={{ control_node_info.openstack_servers[0].private_v4 }}
+  loop_control:
+    loop_var: __ifcfg_line
+  register: network_update
+
+- name: "Restart NetworkManager"
+  service:
+    name: NetworkManager
+    state: restarted
+  when: network_update.changed | bool
+
+- name: "Wait for Satellite to be accessible"
+  ansible.builtin.wait_for:
+    host: "{{ satellite.url | default(default_satellite.url) }}"
+    port: 80
+    delay: 10
+    timeout: 60
+
+- name: "Install Katello CA Cert"
+  yum:
+    name: "{{ satellite.katello_ca_cert_url | default(default_satellite.katello_ca_cert_url) }}"
+    state: present
+    disable_gpg_check: true
+  become: true
+
+- name: "Register System and Activate Subscriptions"
+  redhat_subscription:
+    state: present
+    activationkey: "{{ satellite.activationkey | default(default_satellite.activationkey) }}"
+    org_id: "{{ satellite.org_id | default(default_satellite.org_id) }}"
+    auto_attach: true

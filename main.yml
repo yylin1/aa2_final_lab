@@ -1,3 +1,9 @@
 ---
-- import_playbook: provision_servers.yml
-- import_playbook: database_servers.yml
+# Provision OpenStack instances and configure them
+- import_playbook: 01-provision-instances.yml
+- import_playbook: 02-test-connectivity.yml
+- import_playbook: 03-configure-instances.yml
+- import_playbook: 04a-database-tier.yml
+- import_playbook: 04b-app-tier.yml
+- import_playbook: 04c-lb-tier.yml
+- import_playbook: 05-smoketests.yml

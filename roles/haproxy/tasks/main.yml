@@ -1,0 +1,27 @@
+---
+# tasks file for haproxy
+- name: "Install HAProxy Load Balancer"
+  block:
+    - name: "Install load balancer packages"
+      package:
+        name: "{{ load_balancer_packages }}"
+        state: "{{ haproxy_install_state }}"
+
+    - name: "Configure HAPProxy Load Balancing"
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+      notify: restart_haproxy
+
+    - name: "Enable HAProxy"
+      service:
+        name: haproxy
+        state: started
+        enabled: true
+  when: haproxy_install_state == 'present'
+
+- name: "Remove HAProxy Load Balancer packages"
+  package:
+    name: "{{ load_balancer_packages }}"
+    state: "{{ haproxy_install_state }}"
+  when: haproxy_install_state == 'absent'

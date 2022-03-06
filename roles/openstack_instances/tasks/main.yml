@@ -1,0 +1,21 @@
+---
+# tasks file for openstack_instances
+- name: "Create/Destroy OpenStack instances"
+  openstack.cloud.server:
+    #cloud: "{{ __instance.cloud | default(default_cloud) }}"
+    name: "{{ __instance.name | mandatory }}"
+    image: "{{ __instance.image | default(default_image) }}"
+    key_name: "{{ __instance.keypair | default(default_keypair) }}"
+    flavor: "{{ __instance.flavor | default(default_flavor) }}"
+    security_groups: "{{ __instance.security_group | default(default_security_group) }}"
+    delete_fip: yes
+    wait: no
+    nics:
+      - net-name: "{{ __instance.net_name | default(default_net_name) }}"
+    meta: "AnsibleGroup={{ __instance.metadata.AnsibleGroup | default(default_metadata_AnsibleGroup) }},deployment_name={{ __instance.metadata.deployment_name | default(deployment_name) | default(default_metadata_deployment_name) }}"
+    userdata: |
+      #!/bin/bash
+    state: "{{ instance_state | default(__instance.state) | default(default_instance_state) | default('present') }}"
+  loop: "{{ openstack_instances }}"
+  loop_control:
+    loop_var: __instance

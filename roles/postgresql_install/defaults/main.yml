@@ -1,0 +1,16 @@
+---
+# defaults file for postgresql_install
+postgres_rhel8_repo: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+postgres_rpm_gpg_key: "https://download.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG-12"
+postgres_packages:
+  - postgresql
+  - postgresql-server
+  - postgresql-contrib
+  - postgresql-libs
+postgres_library: python3-psycopg2
+postgres_12_data_dir: /var/lib/pgsql/data
+postgres_12_bin_path: /usr/bin
+postgres_service: postgresql.service
+postgres_port: 5432
+postgres_user: postgres
+postgres_install_state: present

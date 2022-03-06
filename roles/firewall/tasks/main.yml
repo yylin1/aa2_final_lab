@@ -1,0 +1,70 @@
+---
+# tasks file for roles/firewall
+- name: "Override facts if firewall_state is absent"
+  set_fact:
+    firewalld_package_state: absent
+    firewalld_service_enabled: no
+    firewalld_service_state: stopped
+    firewalld_rule_state: disabled
+  when: firewall_state == 'absent'
+
+- name: "Install Firewall package and Start Firewall service"
+  block:
+    - name: "Install Firewall package"
+      ansible.builtin.yum:
+        name: "{{ firewall_package_name }}"
+        state: "{{ firewalld_package_state }}"
+
+    - name: "Start Firewall"
+      ansible.builtin.service:
+        name: "{{ firewall_package_name }}"
+        enabled: "{{ firewalld_service_enabled }}"
+        state: "{{ firewalld_service_state }}"
+  when: firewall_state == 'present'
+
+- name: "Firewall rule: Service port"
+  firewalld:
+    service: "{{ __service }}"
+    state: "{{ firewalld_rule_state }}"
+    immediate: true
+    permanent: true
+  loop: "{{ firewall_services }}"
+  loop_control:
+    loop_var: __service
+  when: firewall_services is defined
+
+- name: "Firewall rule: TCP port"
+  firewalld:
+    port: "{{ __tcp_port }}/tcp"
+    permanent: yes
+    immediate: yes
+    state: "{{ firewalld_rule_state }}"
+  loop: "{{ firewall_tcp_ports }}"
+  loop_control:
+    loop_var: __tcp_port
+  when: firewall_tcp_ports is defined
+
+- name: "Firewall rule: UDP port"
+  firewalld:
+    port: "{{ __udp_port }}/udp"
+    permanent: yes
+    immediate: yes
+    state: "{{ firewalld_rule_state }}"
+  loop: "{{ firewall_udp_ports }}"
+  loop_control:
+    loop_var: __udp_port
+  when: firewall_udp_ports is defined
+
+- name: "Stop and Remove Firewall"
+  block:
+    - name: "Stop Firewall"
+      ansible.builtin.service:
+        name: "{{ firewall_package_name }}"
+        enabled: "{{ firewalld_service_enabled }}"
+        state: "{{ firewalld_service_state }}"
+
+    - name: "Remove Firewall package"
+      ansible.builtin.yum:
+        name: "{{ firewall_package_name }}"
+        state: "{{ firewalld_package_state }}"
+  when: firewall_state == 'absent'

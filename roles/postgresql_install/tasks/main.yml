@@ -1,0 +1,7 @@
+---
+# tasks file for postgresql_install
+- include_tasks: install.yml
+  when: postgres_install_state == "present"
+
+- include_tasks: uninstall.yml
+  when: postgres_install_state == "absent"

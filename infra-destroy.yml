@@ -1,0 +1,16 @@
+---
+# Playbook to destroy OpenStack instances
+- name: "Destroy OpenStack instances"
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  become: false
+  vars_files:
+    - vars/common.yml
+    - vars/openstack_instances.yml
+  vars:
+    instance_state: absent
+  tasks:
+    - name: "Destroy OpenStack instances"
+      include_role:
+        name: openstack_instances

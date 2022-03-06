@@ -1,0 +1,5 @@
+---
+# defaults file for haproxy
+load_balancer_packages:
+  - haproxy
+haproxy_install_state: present

@@ -1,0 +1,30 @@
+---
+- import_playbook: in-memory-inventory.yml
+
+- name: "Print current host groups"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - debug:
+        var: "groups.{{ __group }}"
+      loop:
+        - load_balancers
+        - app_servers
+        - database_servers
+      loop_control:
+        loop_var: __group
+
+- name: "Test connectivity"
+  hosts: load_balancers,app_servers,database_servers
+  gather_facts: false
+  pre_tasks:
+    - name: "Wait 5min for OpenStack deployment instances to be ready for connections"
+      wait_for_connection:
+  tasks:
+    - name: "Verify connectivity"
+      ping:
+      register: output
+
+    - debug:
+        msg: "{{ output }}"

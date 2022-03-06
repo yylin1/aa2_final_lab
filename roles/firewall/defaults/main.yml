@@ -1,0 +1,8 @@
+---
+# defaults file for firewall
+firewall_state: present
+firewall_package_name: firewalld
+firewalld_package_state: latest
+firewalld_service_enabled: yes
+firewalld_service_state: started
+firewalld_rule_state: enabled

@@ -1,0 +1,11 @@
+---
+# defaults file for openstack_instances
+default_cloud: "{{ guid }}-project"
+default_image: rhel-8.3
+default_keypair: "{{ guid }}-keypair"
+default_flavor: GLOBAL-CPU_4_Memory_8192_Disk_30_flavor
+default_security_group: "{{ guid }}-HostSG"
+default_net_name: "{{ guid }}-dev-network"
+default_metadata_AnsibleGroup: app_servers
+default_metadata_deployment_name: dev
+default_instance_state: present

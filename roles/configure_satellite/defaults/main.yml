@@ -1,0 +1,7 @@
+---
+# defaults file for configure_satellite
+default_satellite:
+  url: satellite.example.com
+  org_id: prod
+  activationkey: gpte-labs-rhel8
+  katello_ca_cert_url: http://satellite.example.com/pub/katello-ca-consumer-latest.noarch.rpm
